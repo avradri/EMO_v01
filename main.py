@@ -18,7 +18,7 @@ import textwrap
 
 import matplotlib.pyplot as plt
 
-from emo import config, data_sources, organismality, synergy, gwi, smf, info_time
+from emo import data_sources, organismality, synergy, gwi, smf, info_time
 
 
 def print_header(title: str) -> None:
@@ -27,7 +27,7 @@ def print_header(title: str) -> None:
     print("=" * 80)
 
 
-def run_organismality():
+def run_organismality() -> None:
     print_header("Organismality Index (OI)")
 
     treaties_df = data_sources.load_treaties()
@@ -49,19 +49,20 @@ def run_organismality():
     else:
         print("20-year trend: not enough data.")
 
-    # Optional simple plot
+    # Simple OI plot
     df = result.series
-    plt.figure()
-    plt.plot(df["year"], df["oi"], marker="o")
-    plt.title("Organismality Index (OI) over time")
-    plt.xlabel("Year")
-    plt.ylabel("OI")
-    plt.grid(True)
-    plt.tight_layout()
-    plt.show()
+    if not df.empty:
+        plt.figure()
+        plt.plot(df["year"], df["oi"], marker="o")
+        plt.title("Organismality Index (OI) over time")
+        plt.xlabel("Year")
+        plt.ylabel("OI")
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
 
 
-def run_synergy():
+def run_synergy() -> None:
     print_header("Synergy / O-information-like indicator")
 
     news_df, pubs_df, conflict_df = data_sources.load_synergy_streams()
@@ -80,7 +81,7 @@ def run_synergy():
     print(f"Streams used: {', '.join(result.used_columns)}")
 
 
-def run_gwi():
+def run_gwi() -> None:
     print_header("Global Workspace Ignition (GWI)")
 
     news_df, wiki_df = data_sources.load_gwi_streams()
@@ -103,7 +104,7 @@ def run_gwi():
         print(result.ignition_events.head()[["date", "ignition"]])
 
 
-def run_smf():
+def run_smf() -> None:
     print_header("Self-Model Fidelity (SMF)")
 
     target_df = data_sources.load_co2_target()
@@ -126,7 +127,7 @@ def run_smf():
         print("Correlation: not enough data.")
 
 
-def run_info_time():
+def run_info_time() -> None:
     print_header("Information-time (τ_I)")
 
     skill_df = data_sources.load_ecmwf_skill()
@@ -148,7 +149,7 @@ def run_info_time():
         print("Acceleration factor: undefined (calendar span <= 0).")
 
 
-def main():
+def main() -> None:
     print(
         textwrap.dedent(
             """
