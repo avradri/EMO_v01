@@ -34,7 +34,7 @@ def compute_gwi(
     date_col: str = "date",
     news_col: str = "news_count",
     wiki_col: str = "pageviews",
-    percentile: float = None,
+    percentile: Optional[float] = None,
 ) -> Optional[GWIResult]:
     """
     Compute GWI score and ignition events.
@@ -66,9 +66,13 @@ def compute_gwi(
     df["ignition"] = logistic(df["ignition_raw"].values)
 
     # Threshold by percentile
-    thresh = np.percentile(df["ignition"], percentile)
+    thresh = float(np.percentile(df["ignition"], percentile))
     df["is_ignition"] = df["ignition"] >= thresh
 
     events = df[df["is_ignition"]].copy()
 
-    return GWIResult(time_series=df.sort_values(date_col), threshold=float(thresh), ignition_events=events)
+    return GWIResult(
+        time_series=df.sort_values(date_col),
+        threshold=thresh,
+        ignition_events=events,
+    )
