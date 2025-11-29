@@ -56,13 +56,15 @@ def compute_organismality(
     -------
     OrganismalityResult
     """
-    # Basic alignment on year
+    # Select and align on year
     t = treaties_df[[year_col, treaties_col]].copy()
     c = conflict_df[[year_col, conflict_col]].copy()
 
     df = pd.merge(t, c, on=year_col, how="inner").dropna()
     if df.empty:
-        return OrganismalityResult(series=pd.DataFrame(), latest_value=None, trend_20y_slope=None)
+        return OrganismalityResult(
+            series=pd.DataFrame(), latest_value=None, trend_20y_slope=None
+        )
 
     # Log-transform
     df["coop_log"] = np.log1p(df[treaties_col].astype(float))
@@ -78,11 +80,10 @@ def compute_organismality(
 
     # Trend over the last 20 years, if possible
     df_sorted = df.sort_values(year_col)
-    if len(df_sorted) >= 2:
-        years = df_sorted[year_col].values.astype(float)
-        oi_vals = df_sorted["oi"].values.astype(float)
+    years = df_sorted[year_col].values.astype(float)
+    oi_vals = df_sorted["oi"].values.astype(float)
 
-        # Restrict to last 20 years if available
+    if len(df_sorted) >= 2:
         max_year = years.max()
         mask_20 = years >= (max_year - 19)
         slope, _ = simple_linear_trend(years[mask_20], oi_vals[mask_20])
@@ -92,4 +93,6 @@ def compute_organismality(
 
     latest_value = float(df_sorted.iloc[-1]["oi"])
 
-    return OrganismalityResult(series=df_sorted, latest_value=latest_value, trend_20y_slope=trend_slope)
+    return OrganismalityResult(
+        series=df_sorted, latest_value=latest_value, trend_20y_slope=trend_slope
+    )
