@@ -51,7 +51,10 @@ def compute_smf(
 
     # Normalized gap
     eps = 1e-9
-    denom = np.maximum(np.maximum(np.abs(df[target_col]), np.abs(df[actual_col])), eps)
+    denom = np.maximum(
+        np.maximum(np.abs(df[target_col]), np.abs(df[actual_col])),
+        eps,
+    )
     df["gap_norm"] = (df[actual_col] - df[target_col]) / denom
 
     # SMF(t): high when |gap_norm| is small
@@ -65,4 +68,8 @@ def compute_smf(
     else:
         corr = None
 
-    return SMFResult(series=df.sort_values(year_col), global_smf=global_smf, correlation=corr)
+    return SMFResult(
+        series=df.sort_values(year_col),
+        global_smf=global_smf,
+        correlation=corr,
+    )
