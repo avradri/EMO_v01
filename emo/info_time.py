@@ -39,7 +39,12 @@ def compute_info_time(
     """
     df = skill_df[[year_col, skill_col]].copy().dropna()
     if df.empty or len(df) < 2:
-        return InfoTimeResult(series=pd.DataFrame(), tau_span=None, calendar_span=None, accel_ratio=None)
+        return InfoTimeResult(
+            series=pd.DataFrame(),
+            tau_span=None,
+            calendar_span=None,
+            accel_ratio=None,
+        )
 
     df[year_col] = df[year_col].astype(int)
     df[skill_col] = df[skill_col].astype(float)
@@ -62,4 +67,9 @@ def compute_info_time(
     else:
         accel_ratio = tau_span / calendar_span
 
-    return InfoTimeResult(series=df, tau_span=tau_span, calendar_span=calendar_span, accel_ratio=accel_ratio)
+    return InfoTimeResult(
+        series=df,
+        tau_span=tau_span,
+        calendar_span=calendar_span,
+        accel_ratio=accel_ratio,
+    )
