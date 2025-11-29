@@ -21,7 +21,7 @@ This is a **simple prototype**, not a full Rosas-style Ω implementation.
 """
 
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
@@ -41,6 +41,9 @@ def compute_synergy_gaussian(
     pubs_df: pd.DataFrame,
     conflict_df: Optional[pd.DataFrame] = None,
     year_col: str = "year",
+    news_col: str = "news_count",
+    pubs_col: str = "papers_count",
+    conflict_col: str = "conflict_deaths",
 ) -> SynergyResult:
     """
     Compute a Gaussian synergy-like index from multiple yearly series.
@@ -56,22 +59,22 @@ def compute_synergy_gaussian(
     """
     # Basic inner join on year
     df = pd.merge(
-        news_df[[year_col, "news_count"]],
-        pubs_df[[year_col, "papers_count"]],
+        news_df[[year_col, news_col]],
+        pubs_df[[year_col, pubs_col]],
         on=year_col,
         how="inner",
     )
 
-    cols = ["news_count", "papers_count"]
+    cols = [news_col, pubs_col]
 
-    if conflict_df is not None and "conflict_deaths" in conflict_df.columns:
-        df = pd.merge(df, conflict_df[[year_col, "conflict_deaths"]], on=year_col, how="inner")
-        cols.append("conflict_deaths")
+    if conflict_df is not None and conflict_col in conflict_df.columns:
+        df = pd.merge(df, conflict_df[[year_col, conflict_col]], on=year_col, how="inner")
+        cols.append(conflict_col)
 
     if df.empty or len(df) < 3:
         return SynergyResult(synergy_index=None, used_columns=cols, combined_df=df)
 
-    # Log and z-score
+    # Log-transform and z-score
     for col in cols:
         df[col] = df[col].astype(float)
         df[f"{col}_log"] = np.log1p(df[col])
